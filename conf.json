@@ -1,0 +1,11 @@
+{
+  "config": {
+    "store_type": "DB"
+  },
+  "S3": {
+    "name": "test"
+  },
+  "DB": {
+    "name": "ser"
+  }
+}

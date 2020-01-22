@@ -1,0 +1,79 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description:
+  Deploy the resources for Monty Cloud Assignment
+Parameters:
+  EnvironmentType:
+    Type: String
+    Description: Environment type for the stack.
+    Default: PRODUCTION
+    AllowedValues:
+      - PRODUCTION
+      - PRE-PRODUCTION
+      - QUALITY ASSURANCE
+      - INTEGRATION TESTING
+      - DEVELOPMENT
+      - LAB
+  ResourceOwner:
+    Type: String
+    Description: Email of the person/group responsible for the stack.
+    Default: atul.shrivastav2010@gmail.com
+  MontyCloudRoleName:
+    Type: String
+    Description: The Name of the Role used for Lambda
+    Default: monty-cloud-role
+Resources:
+  MontyCloudRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref MontyCloudRoleName
+      Description: Role for Monty Cloud assessment
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AWSLambdaFullAccess
+      Path: /
+      Tags:
+        - Key: tr:environment-type
+          Value: !Ref EnvironmentType
+        - Key: tr:resource-owner
+          Value: !Ref ResourceOwner
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  GetRecordsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../../dist/api_pipeline.zip
+      FunctionName: get_record
+      Handler: onboarding.lambda.get_record.lambda_handler
+      Role: !GetAtt MontyCloudRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+      Tags:
+        - Key: tr:environment-type
+          Value: !Ref EnvironmentType
+        - Key: tr:resource-owner
+          Value: !Ref ResourceOwner
+  StoreRecordsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../../dist/api_pipeline.zip
+      FunctionName: store_records
+      Handler: onboarding.lambda.store_record.lambda_handler
+      Role: !GetAtt MontyCloudRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+      Tags:
+        - Key: tr:environment-type
+          Value: !Ref EnvironmentType
+        - Key: tr:resource-owner
+          Value: !Ref ResourceOwner
