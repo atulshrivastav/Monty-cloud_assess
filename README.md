@@ -3,4 +3,5 @@ The current code is used to deploy the Lambda and IAM Role. These Lambdas are ca
 
 ## Prerequisites
 User needs to Create a S3 bucket **monty-cloud-deployment-files**, this S3 bucket stores all the deployment files. In the next step user needs to run **deploy.sh** file. This bash script creates a CloudFormation, **api-pipeline** which internally creates required resources. User can see the progress in Configured account in terminal.
-**Note:** Please keep in mind, the code is developed by keeping **Python3** in mind. Hence, make sure, **Python3** is install on the local machine before execution of **depoly.sh** file.
+**Note:**
+Please keep in mind, the code is developed by keeping **Python3** in mind. Hence, make sure, **Python3** is install on the local machine before execution of **depoly.sh** file.
