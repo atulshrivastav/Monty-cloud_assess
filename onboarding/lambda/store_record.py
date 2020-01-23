@@ -1,9 +1,8 @@
-#import yaml
-from base64 import b64decode, b64encode
-from gzip import GzipFile, decompress
-from io import BytesIO
+from base64 import b64decode
+from gzip import decompress
 from json import loads, load, dumps
-from sys import getsizeof
+from onboarding import logger
+
 import boto3
 
 
@@ -13,8 +12,8 @@ def read_config():
         storage_type = fil.get('config')['store_type']
         s3_location = fil.get('S3')['name']
         db_location = fil.get('DB')['name']
-    
     return storage_type, s3_location, db_location
+
 
 def lambda_handler(event, context):
     """
@@ -46,22 +45,18 @@ def lambda_handler(event, context):
             'data': data
            }
     storage_type, s3, db = read_config()
-    print(storage_type)
-    print("**********")
     if not storage_type == 'DB':
-        print("s3 insert code")
-        file_name = "{time}_{source}.json".format(time=timestamp, source=source)
-        #store s3 code
+        logger.info("s3 insert code")
+        file_name = "{time}_{source}.json".format(time=timestamp,
+                                                  source=source)
         s3 = boto3.client('s3')
-        s3.put_object(Body=bytes(dumps(resp).encode('UTF-8')), Bucket = "montycloudstorage", Key=file_name)
+        s3.put_object(Body=bytes(dumps(resp).encode('UTF-8')),
+                      Bucket="montycloudstorage", Key=file_name)
         return file_name
 
     # # store db code
-    print("Writing in DB")
+    logger.info("Writing in DB")
     client = boto3.resource('dynamodb')
     table = client.Table('Montycloudstore')
     table.put_item(Item=resp)
-    print("Data Inserted.")
-    
-    
-        
+    logger.info("Data Inserted.")
