@@ -77,3 +77,17 @@ Resources:
           Value: !Ref EnvironmentType
         - Key: tr:resource-owner
           Value: !Ref ResourceOwner
+  DeployApiLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../../dist/api_pipeline.zip
+      FunctionName: store_records
+      Handler: onboarding.lambda.deploy_api.lambda_handler
+      Role: !GetAtt MontyCloudRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+      Tags:
+        - Key: tr:environment-type
+          Value: !Ref EnvironmentType
+        - Key: tr:resource-owner
+          Value: !Ref ResourceOwner
